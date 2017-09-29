@@ -1,12 +1,43 @@
 {
   "name": "rarjs",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "author": "43081j",
-  "description": "Pure-javascript RAR archive reader using AJAX, File API and local files.",
-  "main": "./dist/rar.js",
+  "contributors": [
+    "Gustavo Rodrigues (https://qgustavor.tk)"
+  ],
+  "description": "Pure-JavaScript RAR archive reader.",
+  "main": "./dist/rar-umd.js",
+  "module": "./dist/rar-es.js",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/43081j/rar.js.git"
   },
-  "license": "MIT"
+  "keywords": [
+    "rar"
+  ],
+  "scripts": {
+    "build": "rollup --config rollup.js",
+    "test": "standard",
+    "dist": "npm run test && npm run build"
+  },
+  "standard": {
+    "ignore": [
+      "dist"
+    ]
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.6.0",
+    "regenerator-runtime": "^0.11.0",
+    "rollup": "^0.50.0",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-commonjs": "^8.2.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "standard": "^10.0.3"
+  }
 }

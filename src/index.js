@@ -5,6 +5,9 @@
  * License: MIT, see LICENSE
  */
 
+// FIXME: build fails without using this
+import 'regenerator-runtime'
+
 // RAR constants
 const OS_NAMES = ['MS-DOS', 'OS/2', 'Windows', 'Unix', 'Mac', 'BeOS']
 const METHODS = {
@@ -144,7 +147,7 @@ async function parseEntry (file, offset, headerData) {
   const size = headerData.readUInt16LE(5)
 
   const data = await file.read(offset, size)
-  const entry = {...TEMPLATE_ENTRY}
+  const entry = Object.assign({}, TEMPLATE_ENTRY)
 
   entry.partial = (flags & 0x01) !== 0 || (flags & 0x02) !== 0
   entry.continuesFrom = (flags & 0x01) !== 0

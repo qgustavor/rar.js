@@ -1,0 +1,106 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>rar.js</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+img,legend{border:0}legend,td,th{padding:0}html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,optgroup,strong{font-weight:700}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{box-sizing:content-box;height:0}pre,textarea{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=checkbox],input[type=radio]{box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-appearance:textfield;box-sizing:content-box}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+
+html, body {height: 100%}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+h1 {margin: 0; color: #14F}
+p {margin: 0 0 2em}
+#file-input {display: none}
+.container {
+  margin: auto;
+  padding: 1em;
+  text-align: center;
+}
+label {
+  border: 1px solid #111;
+  border-radius: 2em;
+  padding: 0.5em 2em;
+  cursor: pointer;
+}
+label:focus {border-width: 3px}
+label:focus, label:hover {
+  border-color: #14F;
+  outline: none;
+  color: #14F;
+}
+a {
+  text-decoration: none;
+  color: #14F;
+}
+a:hover, a:focus {text-decoration: underline}
+</style>
+
+<div class="container">
+<h1>rar.js</h1>
+<p>Open RAR archives in JavaScript <em>blazingly&nbsp;fast</em>
+
+<p><input type="file" id="file-input">
+<label id="file-label" for="file-input" tabindex="0">Open a RAR archive</label>
+
+<p><ul id="file-list"></ul>
+
+<p><a href="https://github.com/qgustavor/rar.js">Source code</a> /
+<a href="https://github.com/qgustavor/rar.js/wiki">Wiki</a>
+
+<!-- Load Node's Buffer (it's the only dependency) and use streams for blazing fast loading
+(modified from filereader-stream to use same options as Node's fs.createReadStream and to export the Buffer global) -->
+<script src="filereader-stream.js"></script>
+
+<!-- Load the library -->
+<script src="rar-umd.js"></script>
+
+<script>
+;(function () {
+  var list = document.getElementById('file-list')
+  var input = document.getElementById('file-input')
+  var label = document.getElementById('file-label')
+
+  input.addEventListener('change', handleInput)
+
+  var reader
+  function handleInput () {
+    label.textContent = 'Loading...'
+    var file = input.files[0]
+
+    rar.loadFile({
+      createReadStream: function (opts) {
+        return fileReaderStream(file, opts)
+      },
+      fileSize: file.size
+    })
+    .then(listFiles)
+    .catch(handleError)
+  }
+
+  function listFiles (archive) {
+    list.innerHTML = ''
+    archive.entries.forEach(addEntry)
+    label.textContent = 'Open other archive'
+  }
+
+  function addEntry (entry) {
+    const li = document.createElement('li')
+    li.textContent = entry.path + (
+      entry.size > 0 ? ' (' + formatSize(entry.size) + ')' : ''
+    )
+    list.appendChild(li)
+  }
+
+  function formatSize (size) {
+    var e = Math.floor(Math.log(size) / Math.log(1024))
+    return (size / Math.pow(1024, e)).toFixed(2) + ' ' + (e ? 'KMGTPEZY'[e - 1] + 'B' : 'Bytes')
+  }
+
+  function handleError (error) {
+    label.textContent = 'Loading failed'
+    console.error(error)
+  }
+}())
+</script>
